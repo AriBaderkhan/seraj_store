@@ -20,15 +20,44 @@ const SellingPage = () => {
     const [paymentMethod, setPaymentMethod] = useState('');
     const [payTotal, setPayTotal] = useState('');
 
-    const handleComplete = () => {
-        completeSale({
-            total_paid: payTotal,
-            customer_name: customerName,
-            payment_method: paymentMethod
-        });
-        setPayTotal('');
-        setCustomerName('');
-        setPaymentMethod('');
+    // Error State
+    const [errors, setErrors] = useState({});
+
+    // Error Component Helper
+    const ErrorDisplay = ({ error }) => {
+        if (!error) return null;
+        return (
+            <div style={{ color: '#d32f2f', fontSize: '0.8rem', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span>⚠️</span>
+                <span>{error}</span>
+            </div>
+        );
+    };
+
+    const handleComplete = async () => {
+        setErrors({}); // Clear previous errors
+        try {
+            await completeSale({
+                total_paid: payTotal,
+                customer_name: customerName,
+                payment_method: paymentMethod
+            });
+            setPayTotal('');
+            setCustomerName('');
+            setPaymentMethod('');
+        } catch (error) {
+            console.error("Sale Error:", error);
+            // If we have a support code, show it nicely
+            const errorMsg = error.support_code
+                ? `${error.message} (Support Code: ${error.support_code})`
+                : error.message || "Sale failed";
+
+            // Map to fields if possible, else general error (or map to 'payTotal' if it looks like a payment error?)
+            // For now, let's put it in a general 'sale' error or just show it above the button if it's not field specific.
+            // But user asked for inline. Let's assume most errors are general or stock related (which show in toast mainly, but here we capture sale submission errors).
+
+            setErrors({ form: errorMsg });
+        }
     };
 
 
@@ -294,11 +323,15 @@ const SellingPage = () => {
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Pay Total</label>
                             <input
                                 type="number"
-                                style={inputStyle}
+                                style={{
+                                    ...inputStyle,
+                                    borderColor: errors.payTotal ? '#d32f2f' : '#ddd'
+                                }}
                                 placeholder="Pay the amount"
                                 value={payTotal}
                                 onChange={(e) => setPayTotal(e.target.value)}
                             />
+                            {/* Future: If we mapped payment errors specifically to this field */}
                         </div>
                         <div>
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Customer Name</label>
@@ -325,28 +358,32 @@ const SellingPage = () => {
                             </select>
                         </div>
 
-                        <button
-                            onClick={handleComplete}
-                            disabled={loading || cart.length === 0}
-                            style={{
-                                marginTop: '0.5rem',
-                                background: loading ? '#ccc' : 'rgb(22 163 74)', // Green
-                                color: 'white',
-                                border: 'none',
-                                padding: '1rem',
-                                borderRadius: '8px',
-                                fontWeight: 'bold',
-                                fontSize: '1rem',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.5rem',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                            }}
-                        >
-                            Complete Sale
-                        </button>
+                        <div style={{ marginTop: '0.5rem' }}>
+                            <button
+                                onClick={handleComplete}
+                                disabled={loading || cart.length === 0}
+                                style={{
+                                    width: '100%',
+                                    background: loading ? '#ccc' : 'rgb(22 163 74)', // Green
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '1rem',
+                                    borderRadius: '8px',
+                                    fontWeight: 'bold',
+                                    fontSize: '1rem',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                Complete Sale
+                            </button>
+                            {/* General Form Error / Sale Error displayed here */}
+                            <ErrorDisplay error={errors.form} />
+                        </div>
                     </div>
 
                 </div>

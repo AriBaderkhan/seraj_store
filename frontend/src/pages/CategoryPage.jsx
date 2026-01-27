@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCategories } from '../hooks/useCategories';
+import AppImage from '../components/AppImage';
 import { FaEdit, FaTrash, FaSave, FaPlus, FaImage, FaTimes } from 'react-icons/fa';
 
 const CategoryPage = () => {
@@ -131,7 +132,11 @@ const CategoryPage = () => {
                                     <tr key={cat.id}>
                                         <td>
                                             {cat.image ? (
-                                                <img src={`http://localhost:1999${cat.image}`} alt={cat.category_name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                                                <AppImage
+                                                    src={cat.image}
+                                                    alt={cat.category_name}
+                                                    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                                                />
                                             ) : (
                                                 <div style={{ width: '40px', height: '40px', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}><FaImage color="#ccc" /></div>
                                             )}

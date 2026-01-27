@@ -4,6 +4,7 @@ import { useItems } from '../../hooks/useItems';
 import { useCategories } from '../../hooks/useCategories';
 import { useBrands } from '../../hooks/useBrands';
 import * as itemService from '../../services/itemService';
+import AppImage from '../../components/AppImage';
 import { FaPlus, FaMobileAlt, FaBoxOpen, FaEye, FaEdit, FaTrash, FaArrowLeft, FaShoppingCart, FaPlusCircle } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
@@ -11,6 +12,7 @@ import ItemFilters from './components/ItemFilters';
 import ItemDetailsModal from './components/ItemDetailsModal';
 import EditItemModal from './components/EditItemModal';
 import AddPurchaseModal from './components/AddPurchaseModal';
+import AppImage from '../../components/AppImage';
 
 const ItemPage = () => {
     const navigate = useNavigate();
@@ -190,7 +192,11 @@ const ItemPage = () => {
                             borderBottom: '1px solid #eee', position: 'relative'
                         }}>
                             {item.image_path ? (
-                                <img src={`http://localhost:1999${item.image_path}`} alt={item.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                                <AppImage
+                                    src={item.image_path}
+                                    alt={item.name}
+                                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                />
                             ) : (
                                 <span style={{ color: '#999' }}>No Image</span>
                             )}
