@@ -1,10 +1,4 @@
 import multer from "multer";
-import path from "path";
-import fs from "fs";
-
-function ensureDir(dir) {
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-}
 
 export default function uploadImage(folderName, options = {}) {
     const {
@@ -12,17 +6,8 @@ export default function uploadImage(folderName, options = {}) {
         allowedMime = ["image/jpeg", "image/png", "image/webp", "image/jpg", "image/avif"],
     } = options;
 
-    const uploadDir = `uploads/${folderName}`;
-    ensureDir(uploadDir);
-
-    const storage = multer.diskStorage({
-        destination: (req, file, cb) => cb(null, uploadDir),
-        filename: (req, file, cb) => {
-            const ext = path.extname(file.originalname).toLowerCase();
-            const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-            cb(null, `${unique}${ext}`);
-        },
-    });
+    // Use memory storage so we can access the buffer
+    const storage = multer.memoryStorage();
 
     const fileFilter = (req, file, cb) => {
         if (!allowedMime.includes(file.mimetype)) {

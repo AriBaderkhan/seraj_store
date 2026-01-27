@@ -1,5 +1,6 @@
 import itemService from "../services/itemService.js";
 import asyncWrap from "../utils/asyncWrap.js";
+import { uploadFileToSupabase } from "../utils/supabaseStorage.js";
 const createItem = asyncWrap(async (req, res) => {
     const { name, brand_id, category_id, details, storage,
         sim_type, color, imei1, imei2, purchase_price, status, qty,
@@ -10,7 +11,7 @@ const createItem = asyncWrap(async (req, res) => {
 
     const created_by = req.user.id;
 
-    const image = req.file ? `/uploads/items/${req.file.filename}` : null;
+    const image = req.file ? await uploadFileToSupabase(req.file, 'items') : null;
 
     const allInputs = {
         name, brand_id, category_id, is_imei_required, details, image,
@@ -40,7 +41,7 @@ const updateItem = asyncWrap(async (req, res) => {
     const updated_by = req.user.id;
 
     // If new image, add path
-    const image = req.file ? `/uploads/items/${req.file.filename}` : undefined;
+    const image = req.file ? await uploadFileToSupabase(req.file, 'items') : undefined;
 
     // Spread body, conditionally add image if present
     const updateData = { ...req.body };

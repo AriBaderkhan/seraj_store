@@ -1,9 +1,10 @@
 import asyncWrap from '../utils/asyncWrap.js';
 import categoryService from '../services/categoryService.js';
+import { uploadFileToSupabase } from '../utils/supabaseStorage.js';
 
 const createCategory = asyncWrap(async (req, res) => {
     const { name, description } = req.body;
-    const image = req.file ? `/uploads/categories/${req.file.filename}` : null;
+    const image = req.file ? await uploadFileToSupabase(req.file, 'categories') : null;
 
     const category = await categoryService.createCategory({ name, description, image });
 
@@ -27,7 +28,7 @@ const updateCategoryById = asyncWrap(async (req, res) => {
     const { name, description } = req.body;
 
     // if a new image uploaded, build the public path that you store in DB
-    const newImage = req.file ? `/uploads/categories/${req.file.filename}` : null;
+    const newImage = req.file ? await uploadFileToSupabase(req.file, 'categories') : null;
 
     const updated = await categoryService.updateCategory(category_id,
         { name, description, newImage });
