@@ -38,9 +38,7 @@ export const useExpenses = () => {
             await expensesService.createExpenses(data);
             return true;
         } catch (error) {
-            console.error("Error creating expense", error);
-            toast.error(error.response?.data?.message || "Failed to create expense");
-            return false;
+            throw error;
         }
     };
 
@@ -49,9 +47,7 @@ export const useExpenses = () => {
             await expensesService.updateExpense(id, data);
             return true;
         } catch (error) {
-            console.error("Error updating expense", error);
-            toast.error(error.response?.data?.message || "Failed to update expense");
-            return false;
+            throw error;
         }
     };
 
@@ -61,8 +57,9 @@ export const useExpenses = () => {
             return true;
         } catch (error) {
             console.error("Error deleting expense", error);
-            toast.error(error.response?.data?.message || "Failed to delete expense");
-            return false;
+            // Propagate error for deletion too, or handle gracefully?
+            // User said EVERYWHERE. So propagate.
+            throw error;
         }
     };
 

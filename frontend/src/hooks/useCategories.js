@@ -15,7 +15,7 @@ export const useCategories = () => {
             setError(null);
         } catch (err) {
             setError(err.message);
-            toast.error('Failed to load categories');
+            // toast.error('Failed to load categories');
         } finally {
             setLoading(false);
         }
@@ -55,8 +55,8 @@ export const useCategories = () => {
             toast.success('Category deleted successfully');
             fetchCategories();
         } catch (err) {
-            // For delete, we might still want a toast if there's no UI for delete error
-            toast.error(err.response?.data?.message || 'Failed to delete category');
+            // Propagate error
+            throw err;
         }
     };
 

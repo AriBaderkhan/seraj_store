@@ -7,6 +7,7 @@ import useSale from '../../../hooks/useSale';
 
 const ItemDetailsModal = ({ isOpen, onClose, data, onRefresh }) => {
     const [editModal, setEditModal] = useState({ open: false, unit: null, type: null });
+    const [error, setError] = useState(null);
     const { addToCart } = useSale();
 
     console.log("ItemDetailsModal Render:", { isOpen, data });
@@ -32,9 +33,10 @@ const ItemDetailsModal = ({ isOpen, onClose, data, onRefresh }) => {
                 toast.success("Unit updated successfully");
                 setEditModal({ open: false, unit: null, type: null });
                 if (onRefresh) onRefresh();
+                if (onRefresh) onRefresh();
             } catch (error) {
                 console.error("Update failed", error);
-                toast.error("Failed to update unit");
+                setError("Failed to update unit");
             }
         };
 
@@ -50,7 +52,7 @@ const ItemDetailsModal = ({ isOpen, onClose, data, onRefresh }) => {
                 if (onRefresh) onRefresh();
             } catch (error) {
                 console.error("Delete failed", error);
-                toast.error("Failed to delete unit");
+                setError("Failed to delete unit");
             }
         };
 
@@ -66,6 +68,11 @@ const ItemDetailsModal = ({ isOpen, onClose, data, onRefresh }) => {
                         <button onClick={onClose} className="close-btn"><FaTimes /></button>
                     </div>
                     <div className="modal-body">
+                        {error && (
+                            <div style={{ background: '#FEE2E2', border: '1px solid #EF4444', color: '#B91C1C', padding: '0.75rem', borderRadius: '4px', marginBottom: '1rem' }}>
+                                {error}
+                            </div>
+                        )}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                             <div>
                                 {data.image_path ? (

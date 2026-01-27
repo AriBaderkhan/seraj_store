@@ -43,9 +43,14 @@ const ReportsPage = () => {
     // --- Report State ---
     const [reportMonth, setReportMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM format
     const [downloading, setDownloading] = useState(false);
+    const [error, setError] = useState(null); // Add error state
 
     const handleDownloadReport = async () => {
-        if (!reportMonth) return toast.error("Please select a month");
+        setError(null);
+        if (!reportMonth) {
+            setError("Please select a month");
+            return;
+        }
 
         try {
             setDownloading(true);
@@ -75,7 +80,7 @@ const ReportsPage = () => {
             toast.success("Report downloaded successfully");
         } catch (error) {
             console.error("Download error:", error);
-            toast.error(error.message);
+            setError(error.message);
         } finally {
             setDownloading(false);
         }
@@ -92,7 +97,11 @@ const ReportsPage = () => {
 
 
     const handleAddType = () => {
-        if (!newType.trim()) return toast.error("Type name is required");
+        setError(null);
+        if (!newType.trim()) {
+            setError("Type name is required");
+            return;
+        }
 
         // Optimistically add to local list
         const newTypeObj = { type: newType };
@@ -106,8 +115,10 @@ const ReportsPage = () => {
     };
 
     const handleSubmitExpense = async () => {
+        setError(null);
         if (!newExpense.amount || !newExpense.type || !newExpense.expense_date) {
-            return toast.error("Please fill all required fields");
+            setError("Please fill all required fields");
+            return;
         }
 
         let success = false;
@@ -198,7 +209,16 @@ const ReportsPage = () => {
                     </button>
                     <h1 style={{ margin: 0, fontSize: '1.8rem', color: '#1f2937' }}>Expenses Management</h1>
                 </div>
+            </div>
 
+            {/* Error Display */}
+            {error && (
+                <div style={{ background: '#FEE2E2', border: '1px solid #EF4444', color: '#B91C1C', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                    {error}
+                </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                     {/* Report Section */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem', borderRight: '1px solid #ddd', paddingRight: '1rem' }}>

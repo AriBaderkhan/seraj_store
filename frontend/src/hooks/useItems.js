@@ -15,7 +15,6 @@ export const useItems = () => {
             setError(null);
         } catch (err) {
             setError(err.message);
-            toast.error('Failed to load items');
         } finally {
             setLoading(false);
         }
@@ -55,8 +54,8 @@ export const useItems = () => {
             toast.success('Item deleted successfully');
             return true;
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to delete item');
-            return false;
+            // Propagate error
+            throw err;
         } finally {
             setLoading(false);
         }

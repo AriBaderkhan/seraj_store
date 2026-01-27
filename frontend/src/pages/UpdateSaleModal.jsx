@@ -9,6 +9,7 @@ const UpdateSaleModal = ({ sale, onClose, onUpdate }) => {
         payment_method: 'cash'
     });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (sale) {
@@ -37,7 +38,7 @@ const UpdateSaleModal = ({ sale, onClose, onUpdate }) => {
             onClose();
         } catch (error) {
             console.error("Update Error:", error);
-            toast.error("Failed to update sale");
+            setError("Failed to update sale");
         } finally {
             setLoading(false);
         }
@@ -64,6 +65,11 @@ const UpdateSaleModal = ({ sale, onClose, onUpdate }) => {
         <div style={modalOverlayStyle}>
             <div style={modalContentStyle}>
                 <h2 style={{ marginTop: 0 }}>Edit Sale</h2>
+                {error && (
+                    <div style={{ background: '#FEE2E2', border: '1px solid #EF4444', color: '#B91C1C', padding: '0.75rem', borderRadius: '4px', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                        {error}
+                    </div>
+                )}
                 <form onSubmit={handleSubmit}>
                     <div style={inputGroupStyle}>
                         <label style={labelStyle}>Customer Name</label>

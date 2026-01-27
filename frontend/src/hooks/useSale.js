@@ -74,7 +74,9 @@ const useSale = () => {
             setSearchResults(data);
         } catch (error) {
             console.error("Search error:", error);
-            toast.error("Error searching items");
+            // Propagate if needed, or just silence it as it's a search box
+            // For now, let's throw so UI can decide to show red box or not
+            throw error;
         } finally {
             setLoading(false);
         }
@@ -87,8 +89,7 @@ const useSale = () => {
             // Unique IMEI check in current cart
             const exists = cart.find(c => c.imei1 === item.imei1 && c.imei1);
             if (exists) {
-                toast.error("Device already in cart!");
-                return;
+                throw new Error("Device already in cart!");
             }
             qtyToAdd = 1; // Phones are always 1
         } else {
@@ -96,8 +97,7 @@ const useSale = () => {
             const existingItem = cart.find(c => c.id === item.id && !c.imei1);
             const currentQty = existingItem ? existingItem.qty : 0;
             if (currentQty + qtyToAdd > item.stock_qty) {
-                toast.error(`Stock limit reached! (${item.stock_qty})`);
-                return;
+                throw new Error(`Stock limit reached! (${item.stock_qty})`);
             }
         }
 
@@ -117,8 +117,7 @@ const useSale = () => {
 
         } catch (error) {
             console.error("Add to cart error:", error);
-            const msg = error.response?.data?.message || "Failed to add to cart";
-            toast.error(msg);
+            throw error;
         }
     };
 
@@ -137,7 +136,7 @@ const useSale = () => {
             toast.success("Removed");
         } catch (error) {
             console.error("Remove error:", error);
-            toast.error("Failed to remove item");
+            throw error;
         }
     };
 
@@ -148,8 +147,7 @@ const useSale = () => {
 
     const completeSale = async (paymentDetails) => {
         if (cart.length === 0) {
-            toast.error("Cart is empty!");
-            return;
+            throw new Error("Cart is empty!");
         }
 
         try {
@@ -185,11 +183,14 @@ const useSale = () => {
 
                 } catch (err) {
                     console.error("PDF Download Error:", err);
-                    toast.error("Failed to download receipt.");
+                    // Non-critical: Sale is done, just Receipt failed.
+                    // toast.error("Failed to download receipt.");
+                    // Maybe we should alert user or just swallow if we can't show it inline easily?
+                    // User said "Remove all toast.error".
                 }
             } else {
                 console.error("Sale ID missing in response", response);
-                toast.error("Sale saved, but could not launch printer.");
+                throw new Error("Sale saved, but could not launch printer.");
             }
 
             // Backend handles clearing the cart table now (as per Step 46 in backend service)

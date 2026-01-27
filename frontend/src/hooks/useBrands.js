@@ -15,7 +15,7 @@ export const useBrands = () => {
             setError(null);
         } catch (err) {
             setError(err.message);
-            toast.error('Failed to load brands');
+            // toast.error('Failed to load brands');
         } finally {
             setLoading(false);
         }
@@ -32,8 +32,7 @@ export const useBrands = () => {
             fetchBrands();
             return true;
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to add brand');
-            return false;
+            throw err;
         }
     };
 
@@ -44,8 +43,7 @@ export const useBrands = () => {
             fetchBrands();
             return true;
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to update brand');
-            return false;
+            throw err;
         }
     };
 
@@ -56,7 +54,7 @@ export const useBrands = () => {
             toast.success('Brand deleted successfully');
             fetchBrands();
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to delete brand');
+            throw err;
         }
     };
 

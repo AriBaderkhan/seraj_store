@@ -12,6 +12,7 @@ const SalesListPage = () => {
     const [expandedSaleId, setExpandedSaleId] = useState(null);
     const [expandedItems, setExpandedItems] = useState([]); // Store items for the expanded sale
     const [loadingDetails, setLoadingDetails] = useState(false);
+    const [pageError, setPageError] = useState(null); // Add error state
 
     // Edit State
     const [editingSale, setEditingSale] = useState(null);
@@ -31,7 +32,7 @@ const SalesListPage = () => {
             setSales(sorted);
         } catch (error) {
             console.error("Fetch Sales Error:", error);
-            toast.error("Failed to load sales history");
+            setPageError("Failed to load sales history");
         } finally {
             setLoading(false);
         }
@@ -61,11 +62,11 @@ const SalesListPage = () => {
                 setExpandedItems(saleDetails.items);
             } else {
                 setExpandedItems([]);
-                toast.error("No items found for this sale.");
+                // toast.error("No items found for this sale."); // Just show empty list or nothing
             }
         } catch (error) {
             console.error("Fetch Sale Details Error:", error);
-            toast.error("Failed to load sale details");
+            setPageError("Failed to load sale details");
         } finally {
             setLoadingDetails(false);
         }
@@ -82,7 +83,7 @@ const SalesListPage = () => {
             fetchSales(search); // Refresh list
         } catch (error) {
             console.error("Delete Error:", error);
-            toast.error("Failed to delete sale");
+            setPageError("Failed to delete sale");
         }
     };
 
@@ -140,6 +141,16 @@ const SalesListPage = () => {
                     </button>
                 </div>
             </div>
+
+            {/* Error Display */}
+            {
+                pageError && (
+                    <div style={{ background: '#FEE2E2', border: '1px solid #EF4444', color: '#B91C1C', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>{pageError}</span>
+                        <button onClick={() => setPageError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#B91C1C', fontWeight: 'bold' }}>&times;</button>
+                    </div>
+                )
+            }
 
             {/* Table Container */}
             <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden', flex: 1, overflowY: 'auto' }}>
@@ -238,7 +249,7 @@ const SalesListPage = () => {
                                                                         <tr key={idx} style={{ borderTop: '1px solid #f3f4f6' }}>
                                                                             <td style={{ padding: '0.75rem', color: '#374151' }}>{item.item_name}</td>
                                                                             <td style={{ padding: '0.75rem', color: '#374151' }}>{item.quantity}</td>
-                                                                            <td style={{ padding: '0.75rem', color: '#374151' }}>$ {Number(item.unit_price).toLocaleString()}</td>
+                                                                            <td style={{ padding: '0.75rem', color: '#374151' }}>IQD {Number(item.unit_price).toLocaleString()}</td>
                                                                             <td style={{ padding: '0.75rem', color: '#374151', fontFamily: 'monospace' }}>{item.imei || '-'}</td>
                                                                             <td style={{ padding: '0.75rem', color: '#374151', fontSize: '0.85rem' }}>
                                                                                 {item.warranty_start_date ?
@@ -275,7 +286,7 @@ const SalesListPage = () => {
                 onClose={() => setEditingSale(null)}
                 onUpdate={handleUpdateSale}
             />
-        </div>
+        </div >
     );
 };
 
