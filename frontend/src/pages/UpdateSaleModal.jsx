@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+
 
 const UpdateSaleModal = ({ sale, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
