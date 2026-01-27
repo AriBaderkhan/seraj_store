@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import fs from 'fs';
+
 
 const createItemSchema = Joi.object({
     // common
@@ -91,12 +91,7 @@ const createItemSchema = Joi.object({
 function createItem(req, res, next) {
     const { error } = createItemSchema.validate(req.body);
     if (error) {
-        // If validation fails, delete the uploaded file if it exists
-        if (req.file) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) console.error("Error deleting file:", err);
-            });
-        }
+        // Validation failure only returns error message; no file cleanup needed for memory storage
         return res.status(400).json({ message: error.details[0].message });
     }
     next();
@@ -133,9 +128,6 @@ const updateItemSchema = Joi.object({
 function updateItem(req, res, next) {
     const { error } = updateItemSchema.validate(req.body);
     if (error) {
-        if (req.file) {
-            fs.unlink(req.file.path, (err) => { if (err) console.error("Error deleting file:", err); });
-        }
         return res.status(400).json({ message: error.details[0].message });
     }
     next();

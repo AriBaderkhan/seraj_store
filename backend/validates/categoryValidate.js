@@ -1,21 +1,16 @@
 import Joi from 'joi';
-import fs from 'fs';
+
 
 const createCategorySchema = Joi.object({
     name: Joi.string().required(),
-    description: Joi.string().optional(),
+    description: Joi.string().allow('').optional(),
     image: Joi.string().optional()
 });
 
 function createCategory(req, res, next) {
     const { error } = createCategorySchema.validate(req.body);
     if (error) {
-        // If validation fails, delete the uploaded file if it exists
-        if (req.file) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) console.error("Error deleting file:", err);
-            });
-        }
+        // If validation fails, we don't need to manually delete from memory storage.
         return res.status(400).json({ message: error.details[0].message });
     }
     next();
