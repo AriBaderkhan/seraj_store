@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:1999';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://seraj-store-backend.onrender.com';
 
 const AppImage = ({ src, alt, className, style }) => {
     const [imgError, setImgError] = useState(false);

@@ -69,7 +69,7 @@ const ItemDetailsModal = ({ isOpen, onClose, data, onRefresh }) => {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                             <div>
                                 {data.image_path ? (
-                                    <img src={`http://localhost:1999${data.image_path}`} alt={data.name} className="item-image" style={{ width: '100%', height: '300px', objectFit: 'contain', background: '#f9fafb' }} />
+                                    <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:1999'}${data.image_path}`} alt={data.name} className="item-image" style={{ width: '100%', height: '300px', objectFit: 'contain', background: '#f9fafb' }} />
                                 ) : (
                                     <div className="item-image" style={{ width: '100%', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f9fafb' }}>No Image</div>
                                 )}
