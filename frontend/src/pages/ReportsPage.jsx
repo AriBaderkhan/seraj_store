@@ -50,7 +50,7 @@ const ReportsPage = () => {
         try {
             setDownloading(true);
             const token = localStorage.getItem('token');
-            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:1999';
+            const baseUrl = import.meta.env.VITE_API_BASE_URL;
             const response = await fetch(`${baseUrl}/api/report/monthly_pdf?month=${reportMonth}`, {
                 method: 'GET',
                 headers: {
