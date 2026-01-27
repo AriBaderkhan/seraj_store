@@ -24,6 +24,8 @@ async function findCategoryById(category_id) {
 
 function deleteFileIfExists(publicPath) {
     // publicPath example: "/uploads/categories/xxx.webp"
+    if (!publicPath || publicPath.startsWith('http')) return;
+
     const relative = publicPath.startsWith("/") ? publicPath.slice(1) : publicPath;
     const fullPath = path.join(process.cwd(), relative);
 
