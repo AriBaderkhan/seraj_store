@@ -30,7 +30,7 @@ async function saleCreate(total_amount, total_paid, customer_name, payment_metho
 
             if (item.imei) {
                 // PHONE LOGIC
-                const imeisList = await itemModel.findImeisByItemId({ item_id: item.item_id });
+                const imeisList = await itemModel.findImeisByItemId(item.item_id);
                 const targetImei = imeisList.find(row => row.imei1 === item.imei || row.imei2 === item.imei);
 
                 if (!targetImei) throw appError('IMEI_NOT_FOUND', `IMEI ${item.imei} not found`, 404);
