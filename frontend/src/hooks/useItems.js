@@ -28,8 +28,8 @@ export const useItems = () => {
             toast.success('Item added successfully');
             return true;
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to add item');
-            return false;
+            // Propagate error for component to handle inline
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -42,8 +42,7 @@ export const useItems = () => {
             toast.success('Item updated successfully');
             return true;
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to update item');
-            return false;
+            throw err;
         } finally {
             setLoading(false);
         }

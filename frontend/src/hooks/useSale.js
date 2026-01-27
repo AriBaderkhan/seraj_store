@@ -200,9 +200,8 @@ const useSale = () => {
             setSearchResults([]);
 
         } catch (error) {
-            console.error("Sale Error:", error);
-            const msg = error.response?.data?.message || "Failed to complete sale";
-            toast.error(msg);
+            // Propagate to component for inline error handling
+            throw error;
         } finally {
             setLoading(false);
         }

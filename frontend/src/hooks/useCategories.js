@@ -32,8 +32,8 @@ export const useCategories = () => {
             fetchCategories(); // Refresh list
             return true;
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to add category');
-            return false;
+            // Propagate error for component to handle inline
+            throw err;
         }
     };
 
@@ -44,8 +44,7 @@ export const useCategories = () => {
             fetchCategories();
             return true;
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to update category');
-            return false;
+            throw err;
         }
     };
 
@@ -56,6 +55,7 @@ export const useCategories = () => {
             toast.success('Category deleted successfully');
             fetchCategories();
         } catch (err) {
+            // For delete, we might still want a toast if there's no UI for delete error
             toast.error(err.response?.data?.message || 'Failed to delete category');
         }
     };

@@ -7,18 +7,24 @@ const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setError('');
         try {
             await login(username, password);
             toast.success('Welcome back!');
             navigate('/dashboard'); // Or home
-        } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+        } catch (err) {
+            console.error(err);
+            const errorMsg = err.support_code
+                ? `${err.message} (Support Code: ${err.support_code})`
+                : err.message || "Login failed";
+            setError(errorMsg);
         } finally {
             setIsSubmitting(false);
         }
@@ -63,10 +69,26 @@ const Login = () => {
                         />
                     </div>
 
+                    {error && (
+                        <div style={{
+                            color: '#d32f2f',
+                            background: '#fde8e8',
+                            padding: '0.75rem',
+                            borderRadius: '8px',
+                            marginTop: '1rem',
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                        }}>
+                            <span>⚠️</span> {error}
+                        </div>
+                    )}
+
                     <button
                         type="submit"
                         className="btn btn-primary"
-                        style={{ width: '100%' }}
+                        style={{ width: '100%', marginTop: '1rem' }}
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? 'Logging in...' : 'Login'}

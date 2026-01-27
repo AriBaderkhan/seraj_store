@@ -125,6 +125,8 @@ const AddItemPage = () => {
         serial_no: '', warranty_month: '', selling_price: '', unit_sell_price: ''
     });
 
+    const [error, setError] = useState(null);
+
     // Effect: Fetch brands when category changes
     useEffect(() => {
         if (formData.category_id) {
@@ -153,6 +155,7 @@ const AddItemPage = () => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
 
         // Basic Validation
         if (!formData.category_id || !formData.brand_id || !formData.name) {
@@ -160,9 +163,17 @@ const AddItemPage = () => {
             return;
         }
 
-        const data = createItemFormData(formData, image, isPhone);
-        const success = await addItem(data);
-        if (success) navigate('/items');
+        try {
+            const data = createItemFormData(formData, image, isPhone);
+            const success = await addItem(data);
+            if (success) navigate('/items');
+        } catch (err) {
+            console.error(err);
+            const errorMsg = err.support_code
+                ? `${err.message} (Support Code: ${err.support_code})`
+                : err.message || "Failed to create item";
+            setError(errorMsg);
+        }
     };
 
     return (
@@ -247,6 +258,22 @@ const AddItemPage = () => {
                             <textarea name="purchase_notes" className="form-textarea" rows="2" value={formData.purchase_notes} onChange={handleChange} placeholder="Where was it bought? Group info? etc." />
                         </div>
                     </div>
+
+                    {error && (
+                        <div style={{
+                            color: '#d32f2f',
+                            background: '#fde8e8',
+                            padding: '0.75rem',
+                            borderRadius: '8px',
+                            marginTop: '1.5rem',
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                        }}>
+                            <span>⚠️</span> {error}
+                        </div>
+                    )}
 
                     <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
                         <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}>

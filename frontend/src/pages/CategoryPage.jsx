@@ -13,9 +13,11 @@ const CategoryPage = () => {
     const [image, setImage] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [error, setError] = useState(null);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
 
         const data = new FormData();
         data.append('name', formData.name);
@@ -24,21 +26,29 @@ const CategoryPage = () => {
             data.append('image', image);
         }
 
-        let success = false;
-        if (editingId) {
-            success = await editCategory(editingId, data);
-        } else {
-            success = await addCategory(data);
-        }
-
-        if (success) {
-            handleCloseModal();
-            // If it was an add, also reset form
-            if (!editingId) {
-                setFormData({ name: '', description: '' });
-                setImage(null);
+        try {
+            let success = false;
+            if (editingId) {
+                success = await editCategory(editingId, data);
+            } else {
+                success = await addCategory(data);
             }
-            e.target.reset?.();
+
+            if (success) {
+                handleCloseModal();
+                // If it was an add, also reset form
+                if (!editingId) {
+                    setFormData({ name: '', description: '' });
+                    setImage(null);
+                }
+                e.target.reset?.();
+            }
+        } catch (err) {
+            console.error(err);
+            const errorMsg = err.support_code
+                ? `${err.message} (Support Code: ${err.support_code})`
+                : err.message || "Operation failed";
+            setError(errorMsg);
         }
     };
 
@@ -107,6 +117,23 @@ const CategoryPage = () => {
                                     accept="image/*"
                                 />
                             </div>
+
+                            {/* Error Display */}
+                            {error && (
+                                <div style={{
+                                    color: '#d32f2f',
+                                    background: '#fde8e8',
+                                    padding: '0.75rem',
+                                    borderRadius: '8px',
+                                    marginBottom: '1rem',
+                                    fontSize: '0.9rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem'
+                                }}>
+                                    <span>⚠️</span> {error}
+                                </div>
+                            )}
 
                             <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
                                 <FaSave style={{ marginRight: '0.5rem' }} /> Save Category

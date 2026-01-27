@@ -39,21 +39,6 @@ api.interceptors.response.use(
     }
 );
 
-// Add a response interceptor to normalize errors
-api.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
-        // Normalizing the error structure
-        const errorData = {
-            message: error.response?.data?.message || "An unexpected error occurred",
-            code: error.response?.data?.code || "UNKNOWN_ERROR",
-            support_code: error.response?.data?.support_code || null,   // Capture Support Code
-            status: error.response?.status
-        };
-        return Promise.reject(errorData);
-    }
-);
+
 
 export default api;
