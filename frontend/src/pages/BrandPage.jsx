@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useBrands } from '../hooks/useBrands';
 import { useCategories } from '../hooks/useCategories';
+import AppImage from '../components/AppImage';
 import { FaEdit, FaTrash, FaSave, FaPlus, FaTimes } from 'react-icons/fa';
 
 const BrandPage = () => {
@@ -171,6 +172,7 @@ const BrandPage = () => {
                             <tbody>
                                 {loadingBrands ? (<tr><td colSpan="4">Loading...</td></tr>) :
                                     safeBrands.map((brand) => {
+
                                         let cats = [];
                                         try {
                                             let rawCats = brand.categories;
