@@ -1,0 +1,358 @@
+import React, { useState } from 'react';
+import useSale from '../hooks/useSale';
+
+const SellingPage = () => {
+    // Usng our custom hook for all logic
+    const {
+        searchQuery,
+        setSearchQuery,
+        searchResults,
+        loading,
+        cart,
+        addToCart,
+        removeFromCart,
+        calculateTotal,
+        completeSale
+    } = useSale();
+
+    // Checkout UI State (Specific to this page view)
+    const [customerName, setCustomerName] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [payTotal, setPayTotal] = useState('');
+
+    const handleComplete = () => {
+        completeSale({
+            total_paid: payTotal,
+            customer_name: customerName,
+            payment_method: paymentMethod
+        });
+        setPayTotal('');
+        setCustomerName('');
+        setPaymentMethod('');
+    };
+
+
+    const inputStyle = {
+        width: '100%',
+        padding: '0.75rem',
+        border: '1px solid #ddd',
+        borderRadius: '8px',
+        fontSize: '1rem',
+        outline: 'none'
+    };
+
+    const headerStyle = {
+        background: 'var(--primary-color)',
+        color: 'white',
+        padding: '1rem',
+        borderRadius: '12px 12px 0 0',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        fontWeight: 'bold',
+        fontSize: '1.1rem'
+    };
+
+    const cardStyle = {
+        background: 'white',
+        borderRadius: '0 0 12px 12px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        padding: '1rem',
+        overflow: 'hidden'
+    };
+
+    return (
+        <div style={{ display: 'flex', height: 'calc(100vh - 100px)', gap: '1.5rem', overflow: 'hidden' }}>
+
+            {/* LEFT SIDE: AVAILABLE ITEMS */}
+            <div style={{ width: '66%', display: 'flex', flexDirection: 'column' }}>
+                {/* Header */}
+                <div style={headerStyle}>
+                    <h2 style={{ margin: 0 }}>Available Items</h2>
+                    <button
+                        onClick={() => window.location.href = '/sales-history'}
+                        style={{
+                            marginLeft: 'auto',
+                            background: 'white',
+                            color: 'var(--primary-color)',
+                            border: 'none',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '6px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem'
+                        }}
+                    >
+                        Scan History
+                    </button>
+                </div>
+
+                {/* Content Box */}
+                <div style={cardStyle}>
+                    {/* Search Bar */}
+                    <div style={{ marginBottom: '1rem' }}>
+                        <input
+                            type="text"
+                            placeholder="Search items by name or ID..."
+                            style={inputStyle}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            autoFocus
+                        />
+                    </div>
+
+                    {/* Table Header */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '50px 3fr 1fr 80px 100px', gap: '1rem', paddingBottom: '0.5rem', borderBottom: '2px solid #eee', fontWeight: 'bold', color: '#666' }}>
+                        <div>#ID</div>
+                        <div>Item Name</div>
+                        <div>Price</div>
+                        <div>Stock</div>
+                        <div style={{ textAlign: 'center' }}>Action</div>
+                    </div>
+
+
+
+                    {/* Table Body */}
+                    <div style={{ overflowY: 'auto', flex: 1, paddingRight: '0.5rem' }}>
+                        {loading ? (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Searching...</div>
+                        ) : !Array.isArray(searchResults) || searchResults.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: '#ccc' }}>
+                                Scan barcode or search name...
+                            </div>
+                        ) : (
+                            searchResults.map((item, index) => {
+                                // Local state for input (we can't easily use useState inside map, so we'll use a controlled input approach by item ID)
+                                // Actually, simpler approach for now: Just use an uncontrolled input ref or a simple state object in the parent if possible.
+                                // But useState inside map is bad.
+                                // Better: Create a sub-component for the row OR just use a single 'qty' state if we select item first.
+                                // User asked for "small input below the quantity to write quantity".
+                                // Let's use a controlled input map in the main component or just a simple input that passes value on click.
+                                // Simplest way without refactoring to subcomponents:
+                                // Use `document.getElementById` or similar is hacky.
+                                // Let's try to keep it simple: We need a state `quantities` map { [itemId]: qty }.
+
+                                return (
+                                    <div key={index} style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '50px 3fr 1fr 80px 100px',
+                                        gap: '1rem',
+                                        padding: '0.75rem 0',
+                                        borderBottom: '1px solid #f0f0f0',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div style={{ color: '#888', fontSize: '0.85rem' }}>#{item.id}</div>
+                                        <div style={{ fontWeight: '500' }}>
+                                            {item.name}
+                                            {item.imei1 && <span style={{ display: 'block', fontSize: '0.75rem', color: '#666' }}>IMEI: {item.imei1}</span>}
+                                            {item.item_type === 'product' && item.serial_no && <span style={{ display: 'block', fontSize: '0.75rem', color: '#666' }}>SN: {item.serial_no}</span>}
+                                        </div>
+                                        <div style={{ fontWeight: 'bold', color: '#444' }}>
+                                            IQD {Number(item.selling_price).toLocaleString()}
+                                        </div>
+                                        <div>
+                                            <span style={{
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '4px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 'bold',
+                                                background: item.stock_qty > 0 ? '#DEF7EC' : '#FDE8E8',
+                                                color: item.stock_qty > 0 ? '#03543F' : '#9B1C1C'
+                                            }}>
+                                                {item.stock_qty}
+                                            </span>
+                                        </div>
+                                        <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                            {item.item_type !== 'phone' && (
+                                                <input
+                                                    id={`qty-${item.id}`}
+                                                    type="number"
+                                                    min="1"
+                                                    defaultValue="1"
+                                                    placeholder="1"
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '4px 8px',
+                                                        border: '1px solid #ccc',
+                                                        borderRadius: '6px',
+                                                        fontSize: '0.9rem',
+                                                        textAlign: 'center',
+                                                        marginBottom: '4px',
+                                                        background: '#fff'
+                                                    }}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    let qtyToAdd = 1;
+                                                    if (item.item_type !== 'phone') {
+                                                        const input = document.getElementById(`qty-${item.id}`);
+                                                        if (input) qtyToAdd = Number(input.value) || 1;
+                                                    }
+                                                    addToCart(item, qtyToAdd);
+                                                }}
+                                                disabled={item.stock_qty <= 0}
+                                                style={{
+                                                    background: item.stock_qty > 0 ? 'var(--primary-color)' : '#ccc',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    padding: '0.4rem 1rem',
+                                                    borderRadius: '6px',
+                                                    cursor: item.stock_qty > 0 ? 'pointer' : 'not-allowed',
+                                                    fontSize: '0.9rem',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                }}
+                                            >
+                                                + Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* RIGHT SIDE: CURRENT BILL */}
+            <div style={{ width: '34%', display: 'flex', flexDirection: 'column' }}>
+                {/* Header */}
+                <div style={headerStyle}>
+                    <h2>Current Bill</h2>
+                </div>
+
+                {/* Bill Content */}
+                <div style={cardStyle}>
+
+                    {/* Cart Table Header */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 30px', gap: '0.5rem', paddingBottom: '0.5rem', borderBottom: '2px solid #eee', fontWeight: 'bold', color: '#666', fontSize: '0.9rem' }}>
+                        <div>Item</div>
+                        <div style={{ textAlign: 'center' }}>Qty</div>
+                        <div style={{ textAlign: 'right' }}>Total</div>
+                        <div></div>
+                    </div>
+
+                    {/* Cart Items (Scrollable) */}
+                    <div style={{ overflowY: 'auto', flex: 1, paddingRight: '0.25rem', marginBottom: '1rem' }}>
+                        {cart.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: '#ccc', fontSize: '0.9rem' }}>Cart is empty</div>
+                        ) : (
+                            cart.map((item, index) => (
+                                <div key={index} style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '2fr 1fr 1fr 30px',
+                                    gap: '0.5rem',
+                                    padding: '0.5rem 0',
+                                    borderBottom: '1px solid #f0f0f0',
+                                    alignItems: 'center',
+                                    fontSize: '0.9rem'
+                                }}>
+                                    <div style={{ fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.name}>
+                                        {item.name}
+                                    </div>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <input
+                                            type="number"
+                                            value={item.qty}
+                                            readOnly
+                                            style={{ width: '40px', textAlign: 'center', border: '1px solid #eee', borderRadius: '4px', background: '#f9f9f9', color: '#333' }}
+                                        />
+                                    </div>
+                                    <div style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                                        IQD {Number(item.total_amount).toLocaleString()}
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <button
+                                            onClick={() => removeFromCart(index, item.id)} /* Passing item.id (item_id) for deletion handling */
+                                            style={{ background: '#FDE8E8', color: '#C81E1E', border: 'none', borderRadius: '4px', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Total Section */}
+                    <div style={{ background: '#f8f9fa', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ color: '#666', fontWeight: 'bold' }}>Total With Tax:</span>
+                            <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#333' }}>
+                                IQD {calculateTotal().toLocaleString()}.00
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Form Inputs */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Pay Total</label>
+                            <input
+                                type="number"
+                                style={inputStyle}
+                                placeholder="Pay the amount"
+                                value={payTotal}
+                                onChange={(e) => setPayTotal(e.target.value)}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Customer Name</label>
+                            <input
+                                type="text"
+                                style={inputStyle}
+                                placeholder="Optional"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Payment Method</label>
+                            <select
+                                style={{ ...inputStyle, background: 'white' }}
+                                value={paymentMethod}
+                                onChange={(e) => setPaymentMethod(e.target.value)}
+                            >
+                                <option value="">Select Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="card">Card</option>
+                                <option value="upi">UPI</option>
+                            </select>
+                        </div>
+
+                        <button
+                            onClick={handleComplete}
+                            disabled={loading || cart.length === 0}
+                            style={{
+                                marginTop: '0.5rem',
+                                background: loading ? '#ccc' : 'rgb(22 163 74)', // Green
+                                color: 'white',
+                                border: 'none',
+                                padding: '1rem',
+                                borderRadius: '8px',
+                                fontWeight: 'bold',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem',
+                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                            }}
+                        >
+                            Complete Sale
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default SellingPage;
