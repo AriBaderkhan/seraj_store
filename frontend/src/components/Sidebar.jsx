@@ -16,8 +16,10 @@ const Sidebar = ({ isOpen, isDesktop, closeMenu }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        logout();
-        navigate('/login');
+        if (window.confirm('Are you sure you want to logout?')) {
+            logout();
+            navigate('/login');
+        }
     };
 
     const navItems = [
@@ -75,7 +77,7 @@ const Sidebar = ({ isOpen, isDesktop, closeMenu }) => {
                         <NavLink
                             key={item.name}
                             to={item.path}
-                            onClick={closeMenu} // Close on mobile navigation
+                            onClick={() => { }} // Keep open on mobile navigation
                             style={({ isActive }) => ({
                                 display: 'flex',
                                 alignItems: 'center',

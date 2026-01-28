@@ -193,6 +193,28 @@ const ReportsPage = () => {
     }
 
     // --- STYLES (Matching SalesListPage) ---
+    const inputStyle = {
+        padding: '0.6rem', // Adjusted slightly for this page if needed, but keeping consistent
+        border: '1px solid #ddd',
+        borderRadius: '6px',
+        fontSize: '0.9rem',
+        outline: 'none'
+    };
+
+    const selectStyle = {
+        ...inputStyle,
+        appearance: 'none',
+        WebkitAppearance: 'none',
+        MozAppearance: 'none',
+        backgroundColor: 'white',
+        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280' stroke-width='2'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3e%3c/path%3e%3c/svg%3e")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 0.75rem center',
+        backgroundSize: '1.2rem',
+        paddingRight: '2rem', // Ensure text doesn't overlap arrow
+        cursor: 'pointer'
+    };
+
     const tableHeaderStyle = { padding: '1rem', borderBottom: '2px solid #eee', fontWeight: 'bold', color: '#666', fontSize: '0.9rem', textAlign: 'left' };
     const tableCellStyle = { padding: '1rem', borderBottom: '1px solid #f0f0f0', color: '#333' };
 
@@ -203,10 +225,6 @@ const ReportsPage = () => {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    {/* Back button optional if this isn't a sub-page, but keeping for consistency if requested */}
-                    <button onClick={() => navigate('/dashboard')} style={{ padding: '0.5rem 1rem', border: '1px solid #ddd', background: 'white', borderRadius: '6px', cursor: 'pointer' }}>
-                        ← Back
-                    </button>
                     <h1 style={{ margin: 0, fontSize: '1.8rem', color: '#1f2937' }}>Expenses Management</h1>
                 </div>
             </div>
@@ -226,6 +244,8 @@ const ReportsPage = () => {
                         <input
                             type="month"
                             value={reportMonth}
+                            max={new Date().toISOString().slice(0, 7)}
+                            min="2026-01"
                             onChange={(e) => setReportMonth(e.target.value)}
                             style={{ padding: '0.5rem', border: '1px solid #ddd', borderRadius: '6px' }}
                         />
@@ -250,9 +270,9 @@ const ReportsPage = () => {
 
                     {/* Filters */}
                     <select
+                        style={selectStyle}
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(e.target.value)}
-                        style={{ padding: '0.6rem', border: '1px solid #ddd', borderRadius: '6px', outline: 'none', cursor: 'pointer' }}
                     >
                         <option value="">All Months</option>
                         {availableMonths.map(m => (
@@ -263,7 +283,7 @@ const ReportsPage = () => {
                     <select
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
-                        style={{ padding: '0.6rem', border: '1px solid #ddd', borderRadius: '6px', outline: 'none', cursor: 'pointer' }}
+                        style={selectStyle}
                     >
                         <option value="">All Types</option>
                         {availableTypes.map((t, idx) => (
@@ -285,12 +305,13 @@ const ReportsPage = () => {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead style={{ background: '#f8f9fa' }}>
                         <tr>
-                            <th style={tableHeaderStyle}>#</th>
-                            <th style={tableHeaderStyle}>Date</th>
-                            <th style={tableHeaderStyle}>Company (Type)</th>
-                            <th style={tableHeaderStyle}>Note</th>
-                            <th style={tableHeaderStyle}>Amount</th>
-                            <th style={{ ...tableHeaderStyle, textAlign: 'right' }}>Actions</th>
+                            <th style={{ ...tableHeaderStyle, width: '5%' }}>#</th>
+                            <th style={{ ...tableHeaderStyle, width: '15%' }}>Date</th>
+                            <th style={{ ...tableHeaderStyle, width: '15%' }}>Type</th>
+                            <th style={{ ...tableHeaderStyle, width: '20%' }}>Note</th>
+                            <th style={{ ...tableHeaderStyle, width: '15%' }}>Amount</th>
+                            <th style={{ ...tableHeaderStyle, width: '10%' }}>Actions</th>
+
                         </tr>
                     </thead>
                     <tbody>

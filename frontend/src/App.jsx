@@ -12,6 +12,8 @@ import SalesListPage from './pages/SalesListPage';
 import ReportsPage from './pages/ReportsPage';
 import { Toaster } from 'react-hot-toast';
 
+import OfflineNotice from './components/OfflineNotice';
+
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -23,6 +25,7 @@ const PrivateRoute = ({ children }) => {
 function App() {
   return (
     <>
+      <OfflineNotice />
       <Toaster position="top-right" />
       <Routes>
         <Route path="/login" element={<Login />} />

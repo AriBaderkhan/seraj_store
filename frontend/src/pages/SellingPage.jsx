@@ -70,6 +70,18 @@ const SellingPage = () => {
         outline: 'none'
     };
 
+    const selectStyle = {
+        ...inputStyle,
+        appearance: 'none',
+        WebkitAppearance: 'none',
+        MozAppearance: 'none',
+        backgroundColor: 'white',
+        backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280' stroke-width='2'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3e%3c/path%3e%3c/svg%3e")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 0.75rem center',
+        backgroundSize: '1.2rem'
+    };
+
     const headerStyle = {
         background: 'var(--primary-color)',
         color: 'white',
@@ -92,6 +104,16 @@ const SellingPage = () => {
         padding: '1rem',
         overflow: 'hidden'
     };
+
+    // Auto-fill Pay Total when cart changes
+    React.useEffect(() => {
+        const total = calculateTotal();
+        if (total > 0) {
+            setPayTotal(total.toString());
+        } else {
+            setPayTotal('');
+        }
+    }, [cart, calculateTotal]);
 
     return (
         <div style={{ display: 'flex', height: 'calc(100vh - 100px)', gap: '1.5rem', overflow: 'hidden' }}>
@@ -308,17 +330,26 @@ const SellingPage = () => {
                     </div>
 
                     {/* Total Section */}
-                    <div style={{ background: '#f8f9fa', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#666', fontWeight: 'bold' }}>Total With Tax:</span>
-                            <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#333' }}>
-                                IQD {calculateTotal().toLocaleString()}.00
-                            </span>
+                    <div
+                        className="bg-gradient-to-br from-red-50 to-white border border-red-100 p-5 rounded-xl shadow-sm"
+                        style={{ marginBottom: '2.5rem' }}
+                    >
+                        <div className="flex flex-wrap justify-between items-center gap-4">
+                            <div className="flex flex-col">
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total Payable</span>
+                                {/* <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full w-fit font-medium">Tax Included</span> */}
+                            </div>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-lg font-bold text-gray-400">IQD</span>
+                                <span className="text-4xl font-black text-gray-800 tracking-tight">
+                                    {calculateTotal().toLocaleString()}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Form Inputs */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
                         <div>
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Pay Total</label>
                             <input
@@ -347,7 +378,7 @@ const SellingPage = () => {
                         <div>
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Payment Method</label>
                             <select
-                                style={{ ...inputStyle, background: 'white' }}
+                                style={selectStyle}
                                 value={paymentMethod}
                                 onChange={(e) => setPaymentMethod(e.target.value)}
                             >
@@ -362,22 +393,7 @@ const SellingPage = () => {
                             <button
                                 onClick={handleComplete}
                                 disabled={loading || cart.length === 0}
-                                style={{
-                                    width: '100%',
-                                    background: loading ? '#ccc' : 'rgb(22 163 74)', // Green
-                                    color: 'white',
-                                    border: 'none',
-                                    padding: '1rem',
-                                    borderRadius: '8px',
-                                    fontWeight: 'bold',
-                                    fontSize: '1rem',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem',
-                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                                }}
+                                className="btn btn-success w-full  bg-green-800 hover:bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer display-flex items-center justify-center gap-2 box-shadow-md hover:box-shadow-lg active:scale-95 transition-all duration-200"
                             >
                                 Complete Sale
                             </button>
@@ -387,8 +403,8 @@ const SellingPage = () => {
                     </div>
 
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

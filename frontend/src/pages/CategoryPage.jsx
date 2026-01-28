@@ -69,6 +69,10 @@ const CategoryPage = () => {
         setIsModalOpen(false);
     };
 
+
+    const tableHeaderStyle = { padding: '1rem', borderBottom: '2px solid #eee', fontWeight: 'bold', color: '#666', fontSize: '0.9rem', textAlign: 'left' };
+
+
     return (
         <div>
             <div className="page-header">
@@ -93,7 +97,9 @@ const CategoryPage = () => {
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
-                                    placeholder="e.g. Wireless Earphones"
+                                    placeholder="Phones , Covers"
+                                    style={{ fontFamily: 'var(--font-family)' }}
+
                                 />
                             </div>
 
@@ -105,15 +111,16 @@ const CategoryPage = () => {
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     placeholder="Description..."
+                                    style={{ resize: 'none', fontFamily: 'var(--font-family)' }}
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Category Image</label>
+                                <label className="form-label">Category Image (Optional)</label>
                                 <input
                                     type="file"
                                     onChange={(e) => setImage(e.target.files[0])}
-                                    className="form-input"
+                                    className="form-input p-0 file:mr-4 file:py-3 file:px-4 file:rounded-l-md file:border-0 file:text-sm file:font-semibold file:bg-red-800 file:text-white hover:file:bg-red-900 cursor-pointer"
                                     accept="image/*"
                                 />
                             </div>
@@ -135,8 +142,10 @@ const CategoryPage = () => {
                                 </div>
                             )}
 
-                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                                <FaSave style={{ marginRight: '0.5rem' }} /> Save Category
+                            <button type="submit"
+                                className="btn btn-primary w-full shadow-md hover:shadow-lg active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+                            >
+                                <FaSave /> Save Category
                             </button>
                         </form>
                     </div>
@@ -148,10 +157,10 @@ const CategoryPage = () => {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Image</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Actions</th>
+                                    <th style={{ ...tableHeaderStyle, width: '20%' }}>Image</th>
+                                    <th style={{ ...tableHeaderStyle, width: '20%' }}>Name</th>
+                                    <th style={{ ...tableHeaderStyle, width: '25%' }}>Description</th>
+                                    <th style={{ ...tableHeaderStyle, width: '5%' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>

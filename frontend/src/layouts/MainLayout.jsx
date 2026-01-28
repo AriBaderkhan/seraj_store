@@ -45,7 +45,11 @@ const MainLayout = () => {
                         padding: '1rem',
                         color: 'white',
                         display: 'flex',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 30,
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                     }}>
                         <button
                             onClick={() => setIsSidebarOpen(true)}

@@ -3,6 +3,7 @@ import { useBrands } from '../hooks/useBrands';
 import { useCategories } from '../hooks/useCategories';
 import AppImage from '../components/AppImage';
 import { FaEdit, FaTrash, FaSave, FaPlus, FaTimes } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 const BrandPage = () => {
     const { brands, addBrand, editBrand, removeBrand, loading: loadingBrands } = useBrands();
@@ -39,6 +40,12 @@ const BrandPage = () => {
             description: formData.description,
             category_ids: Array.isArray(formData.category_ids) ? formData.category_ids : []
         };
+
+        // Validation
+        if (submissionData.category_ids.length === 0) {
+            toast.error("Please select at least one category");
+            return;
+        }
 
         let success = false;
         if (editingId) {
@@ -113,6 +120,7 @@ const BrandPage = () => {
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     required
                                     placeholder="e.g. Samsung"
+                                    style={{ fontFamily: 'var(--font-family)' }}
                                 />
                             </div>
 
@@ -124,17 +132,20 @@ const BrandPage = () => {
                                     value={formData.description || ''}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     placeholder="Description..."
+                                    style={{ resize: 'none', fontFamily: 'var(--font-family)' }}
+
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Select Categories</label>
+                                <label className="form-label">Select Categories (Select at least one)</label>
                                 <div style={{
                                     maxHeight: '150px',
                                     overflowY: 'auto',
                                     border: '1px solid var(--border-color)',
                                     padding: '0.5rem',
-                                    borderRadius: 'var(--radius-md)'
+                                    borderRadius: 'var(--radius-md)',
+                                    fontFamily: 'var(--font-family)'
                                 }}>
                                     {loadingCats ? <p>Loading categories...</p> :
                                         safeCategories.map(cat => (
@@ -143,6 +154,7 @@ const BrandPage = () => {
                                                     type="checkbox"
                                                     checked={Array.isArray(formData.category_ids) && formData.category_ids.includes(cat.id)}
                                                     onChange={() => handleCategoryToggle(cat.id)}
+
                                                 />
                                                 <span>{cat.category_name}</span>
                                             </label>
@@ -150,8 +162,10 @@ const BrandPage = () => {
                                 </div>
                             </div>
 
-                            <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                                <FaSave style={{ marginRight: '0.5rem' }} /> Save Brand
+                            <button type="submit"
+                                className="btn btn-primary w-full shadow-md hover:shadow-lg active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+                            >
+                                <FaSave /> Save Brand
                             </button>
                         </form>
                     </div>
@@ -198,7 +212,7 @@ const BrandPage = () => {
                                                 <td>{brand.description || '-'}</td>
                                                 <td>
                                                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                        <button onClick={() => handleEditClick(brand)} className="btn btn-sm" style={{ backgroundColor: '#0EA5E9', color: 'white' }} title="Edit"><FaEdit /></button>
+                                                        <button onClick={() => handleEditClick(brand)} className="btn btn-sm " style={{ backgroundColor: '#0EA5E9', color: 'white' }} title="Edit"><FaEdit /></button>
                                                         <button onClick={() => removeBrand(brand.id)} className="btn btn-sm btn-danger" title="Delete"><FaTrash /></button>
                                                     </div>
                                                 </td>

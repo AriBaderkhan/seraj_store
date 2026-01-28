@@ -161,7 +161,7 @@ const ItemPage = () => {
                             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
                             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                         >
-                            <div style={{ fontSize: '3rem', color: 'var(--primary-color)', marginBottom: '1rem' }}>
+                            <div className="text-4xl text-primary mb-4 flex justify-center items-center h-16 text-red-800 ">
                                 {cat.category_name.toLowerCase().includes('mobile') || cat.category_name.toLowerCase().includes('phone')
                                     ? <FaMobileAlt /> : <FaBoxOpen />}
                             </div>
