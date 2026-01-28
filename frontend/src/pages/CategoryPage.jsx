@@ -153,8 +153,8 @@ const CategoryPage = () => {
 
                 <div className="card" style={{ gridColumn: editingId ? '1 / span 2' : 'auto' }}>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '1rem' }}>Current Categories</h3>
-                    <div className="table-container">
-                        <table>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ minWidth: '600px', width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th style={{ ...tableHeaderStyle, width: '20%' }}>Image</th>

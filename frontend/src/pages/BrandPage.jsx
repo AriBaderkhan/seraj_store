@@ -173,8 +173,8 @@ const BrandPage = () => {
 
                 <div className="card" style={{ gridColumn: editingId ? '1 / span 2' : 'auto' }}>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '1rem' }}>Current Brands</h3>
-                    <div className="table-container">
-                        <table>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ minWidth: '600px', width: '100%' }}>
                             <thead>
                                 <tr>
                                     <th>Name</th>

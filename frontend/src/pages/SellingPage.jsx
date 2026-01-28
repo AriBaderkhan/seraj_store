@@ -115,11 +115,32 @@ const SellingPage = () => {
         }
     }, [cart, calculateTotal]);
 
+    // Responsive Check
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
+
+    React.useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth > 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
-        <div style={{ display: 'flex', height: 'calc(100vh - 100px)', gap: '1.5rem', overflow: 'hidden' }}>
+        <div style={{
+            display: isDesktop ? 'flex' : 'block',
+            height: isDesktop ? 'calc(100vh - 100px)' : 'auto',
+            gap: '1.5rem',
+            overflow: isDesktop ? 'hidden' : 'auto',
+            paddingBottom: isDesktop ? 0 : '2rem' // Add space at bottom for mobile scrolling
+        }}>
 
             {/* LEFT SIDE: AVAILABLE ITEMS */}
-            <div style={{ width: '66%', display: 'flex', flexDirection: 'column' }}>
+            <div style={{
+                width: isDesktop ? '66%' : '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                height: isDesktop ? '100%' : '600px', // Give it a fixed height on mobile or let it go auto? '600px' prevents infinite scroll confusion if list is long.
+                marginBottom: isDesktop ? 0 : '2rem'
+            }}>
                 {/* Header */}
                 <div style={headerStyle}>
                     <h2 style={{ margin: 0 }}>Available Items</h2>
@@ -188,12 +209,13 @@ const SellingPage = () => {
 
                                 return (
                                     <div key={index} style={{
-                                        display: 'grid',
+                                        display: isDesktop ? 'grid' : 'flex',
+                                        flexDirection: isDesktop ? 'initial' : 'column',
                                         gridTemplateColumns: '50px 3fr 1fr 80px 100px',
                                         gap: '1rem',
                                         padding: '0.75rem 0',
                                         borderBottom: '1px solid #f0f0f0',
-                                        alignItems: 'center'
+                                        alignItems: isDesktop ? 'center' : 'flex-start'
                                     }}>
                                         <div style={{ color: '#888', fontSize: '0.85rem' }}>#{item.id}</div>
                                         <div style={{ fontWeight: '500' }}>
@@ -270,7 +292,7 @@ const SellingPage = () => {
             </div>
 
             {/* RIGHT SIDE: CURRENT BILL */}
-            <div style={{ width: '34%', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ width: isDesktop ? '33%' : '100%', display: 'flex', flexDirection: 'column' }}>
                 {/* Header */}
                 <div style={headerStyle}>
                     <h2>Current Bill</h2>
