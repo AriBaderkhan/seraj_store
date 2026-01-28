@@ -301,8 +301,8 @@ const ReportsPage = () => {
             </div>
 
             {/* Table Container */}
-            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'hidden', flex: 1, overflowY: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div style={{ background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', overflow: 'auto', flex: 1 }}>
+                <table style={{ width: '100%', minWidth: '800px', borderCollapse: 'collapse' }}>
                     <thead style={{ background: '#f8f9fa' }}>
                         <tr>
                             <th style={{ ...tableHeaderStyle, width: '5%' }}>#</th>

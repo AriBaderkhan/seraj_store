@@ -136,7 +136,7 @@ const ItemPage = () => {
             <div>
                 <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h2 className="page-title">Items Management</h2>
-                    <button onClick={() => navigate('/items/add')} className="btn btn-primary">
+                    <button onClick={() => navigate('/items/add')} className="btn btn-primary " style={{ fontSize: '0.8rem' }}>
                         <FaPlus style={{ marginRight: '0.5rem' }} /> Add New Item
                     </button>
                 </div>
