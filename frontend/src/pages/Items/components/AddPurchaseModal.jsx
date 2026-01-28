@@ -44,8 +44,8 @@ const AddPurchaseModal = ({ isOpen, onClose, item, onSave }) => {
         };
 
         if (isPhone) {
-            payload.imei1 = formData.imei1;
-            payload.imei2 = formData.imei2;
+            if (formData.imei1) payload.imei1 = formData.imei1;
+            if (formData.imei2) payload.imei2 = formData.imei2;
             payload.status = formData.status;
             payload.phone_detail = formData.phone_detail;
 
@@ -83,7 +83,7 @@ const AddPurchaseModal = ({ isOpen, onClose, item, onSave }) => {
                             <>
                                 <div className="form-group">
                                     <label className="form-label">IMEI 1</label>
-                                    <input type="text" className="form-input" value={formData.imei1} required
+                                    <input type="text" className="form-input" value={formData.imei1}
                                         onChange={e => setFormData({ ...formData, imei1: e.target.value })} />
                                 </div>
                                 <div className="form-group">

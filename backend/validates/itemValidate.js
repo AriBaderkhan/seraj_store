@@ -31,13 +31,13 @@ const createItemSchema = Joi.object({
         otherwise: Joi.forbidden(), // covers can have color
     }),
 
-    imei1: Joi.string().when("is_imei_required", {
+    imei1: Joi.string().allow('', null).when("is_imei_required", {
         is: true,
-        then: Joi.required(),
+        then: Joi.optional(),
         otherwise: Joi.forbidden(),
     }),
 
-    imei2: Joi.string().allow('').when("is_imei_required", {
+    imei2: Joi.string().allow('', null).when("is_imei_required", {
         is: true,
         then: Joi.optional(),
         otherwise: Joi.forbidden(),

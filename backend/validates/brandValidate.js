@@ -3,7 +3,7 @@ import Joi from 'joi';
 const createBrandSchema = Joi.object({
     name: Joi.string().required(),
     category_ids: Joi.array().items(Joi.number().integer().positive()).required(),
-    description: Joi.string().optional()
+    description: Joi.string().allow('').optional()
 });
 
 function createBrand(req, res, next) {

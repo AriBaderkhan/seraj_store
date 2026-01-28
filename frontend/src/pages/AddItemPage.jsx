@@ -59,18 +59,18 @@ const AddItemPage = () => {
         data.append('category_id', formData.category_id);
         data.append('details', formData.details);
         data.append('is_imei_required', isPhone);
-        data.append('serial_no', formData.serial_no);
+        if (formData.serial_no) data.append('serial_no', formData.serial_no);
         if (image) data.append('image', image);
 
         if (isPhone) {
             data.append('color', formData.color);
             data.append('storage', formData.storage);
             data.append('sim_type', formData.sim_type);
-            data.append('imei1', formData.imei1);
-            data.append('imei2', formData.imei2);
+            if (formData.imei1) data.append('imei1', formData.imei1);
+            if (formData.imei2) data.append('imei2', formData.imei2);
             data.append('purchase_price', formData.purchase_price);
             data.append('selling_price', formData.selling_price);
-            data.append('warranty_month', formData.warranty_month);
+            if (formData.warranty_month) data.append('warranty_month', formData.warranty_month);
             data.append('status', 'in_stock');
         } else {
             data.append('stock_qty', formData.stock_qty);
@@ -192,7 +192,7 @@ const AddItemPage = () => {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">IMEI 1</label>
-                                    <input type="text" name="imei1" className="form-input" value={formData.imei1} onChange={handleChange} placeholder="Required for phones" />
+                                    <input type="text" name="imei1" className="form-input" value={formData.imei1} onChange={handleChange} placeholder="IMEI Number (Optional)" />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">IMEI 2 (Optional)</label>

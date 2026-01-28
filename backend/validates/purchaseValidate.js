@@ -9,13 +9,13 @@ const createPurchaseSchema = Joi.object({
     selling_price: Joi.number().optional(),
     status: Joi.string().valid("in_stock", "sold", "returned").optional(),
     warranty_month: Joi.alternatives().try(Joi.number(), Joi.string().allow('').valid(null)).optional(),
-    phone_detail: Joi.string().optional(),
+    phone_detail: Joi.string().allow('').optional(),
 
     // -------- NON-PHONE ONLY --------
     unit_cost: Joi.number().optional(),
     unit_sell_price: Joi.number().optional(),
     qty: Joi.number().integer().min(0).optional(),
-    other_item_detail: Joi.string().optional(),
+    other_item_detail: Joi.string().allow('').optional(),
 
     purchase_notes: Joi.string().allow('').optional(),
 });
@@ -43,10 +43,10 @@ function updateDevice(req, res, next) {
 }
 
 const updateOtherSchema = Joi.object({
-    unit_cost: Joi.number().optional(),
+    unit_cost: Joi.number().allow('').optional(),
     unit_sell_price: Joi.number().optional(),
     qty: Joi.number().integer().min(0).optional(),
-    other_item_detail: Joi.string().optional(),
+    other_item_detail: Joi.string().allow('').optional(),
     purchase_notes: Joi.string().allow('').optional(),
 });
 function updateOther(req, res, next) {

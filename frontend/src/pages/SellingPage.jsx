@@ -37,10 +37,14 @@ const SellingPage = () => {
     const handleComplete = async () => {
         setErrors({}); // Clear previous errors
         try {
+            if (payTotal === "" || payTotal === null || payTotal === undefined) {
+                setErrors({ payTotal: "Pay Total is required" });
+                return;
+            }
             await completeSale({
                 total_paid: payTotal,
-                customer_name: customerName,
-                payment_method: paymentMethod
+                customer_name: customerName || "",
+                payment_method: paymentMethod || 'cash'
             });
             setPayTotal('');
             setCustomerName('');
@@ -51,10 +55,6 @@ const SellingPage = () => {
             const errorMsg = error.support_code
                 ? `${error.message} (Support Code: ${error.support_code})`
                 : error.message || "Sale failed";
-
-            // Map to fields if possible, else general error (or map to 'payTotal' if it looks like a payment error?)
-            // For now, let's put it in a general 'sale' error or just show it above the button if it's not field specific.
-            // But user asked for inline. Let's assume most errors are general or stock related (which show in toast mainly, but here we capture sale submission errors).
 
             setErrors({ form: errorMsg });
         }
@@ -107,12 +107,7 @@ const SellingPage = () => {
 
     // Auto-fill Pay Total when cart changes
     React.useEffect(() => {
-        const total = calculateTotal();
-        if (total > 0) {
-            setPayTotal(total.toString());
-        } else {
-            setPayTotal('');
-        }
+        setPayTotal(calculateTotal().toString());
     }, [cart, calculateTotal]);
 
     // Responsive Check
@@ -197,16 +192,6 @@ const SellingPage = () => {
                             </div>
                         ) : (
                             searchResults.map((item, index) => {
-                                // Local state for input (we can't easily use useState inside map, so we'll use a controlled input approach by item ID)
-                                // Actually, simpler approach for now: Just use an uncontrolled input ref or a simple state object in the parent if possible.
-                                // But useState inside map is bad.
-                                // Better: Create a sub-component for the row OR just use a single 'qty' state if we select item first.
-                                // User asked for "small input below the quantity to write quantity".
-                                // Let's use a controlled input map in the main component or just a simple input that passes value on click.
-                                // Simplest way without refactoring to subcomponents:
-                                // Use `document.getElementById` or similar is hacky.
-                                // Let's try to keep it simple: We need a state `quantities` map { [itemId]: qty }.
-
                                 return (
                                     <div key={index} style={{
                                         display: isDesktop ? 'grid' : 'flex',
@@ -259,29 +244,42 @@ const SellingPage = () => {
                                                     onClick={(e) => e.stopPropagation()}
                                                 />
                                             )}
-                                            <button
-                                                onClick={() => {
-                                                    let qtyToAdd = 1;
-                                                    if (item.item_type !== 'phone') {
-                                                        const input = document.getElementById(`qty-${item.id}`);
-                                                        if (input) qtyToAdd = Number(input.value) || 1;
-                                                    }
-                                                    addToCart(item, qtyToAdd);
-                                                }}
-                                                disabled={item.stock_qty <= 0}
-                                                style={{
-                                                    background: item.stock_qty > 0 ? 'var(--primary-color)' : '#ccc',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    padding: '0.4rem 1rem',
-                                                    borderRadius: '6px',
-                                                    cursor: item.stock_qty > 0 ? 'pointer' : 'not-allowed',
-                                                    fontSize: '0.9rem',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                                }}
-                                            >
-                                                + Add
-                                            </button>
+                                            {(() => {
+                                                // We removed the 'isPhoneInCart' visual disable so the user can TRY to add,
+                                                // and receive the Backend Error Message as requested ("Show the message").
+                                                // const isPhoneInCart = item.item_type === 'phone' && cart.some(c => c.imei1 === item.imei1);
+                                                return (
+                                                    <button
+                                                        onClick={async () => {
+                                                            let qtyToAdd = 1;
+                                                            if (item.item_type !== 'phone') {
+                                                                const input = document.getElementById(`qty-${item.id}`);
+                                                                if (input) qtyToAdd = Number(input.value) || 1;
+                                                            }
+                                                            try {
+                                                                await addToCart(item, qtyToAdd);
+                                                            } catch (err) {
+                                                                console.error("Add Error:", err);
+                                                                toast.error(err.message);
+                                                                setErrors({ form: err.message });
+                                                            }
+                                                        }}
+                                                        disabled={item.stock_qty <= 0}
+                                                        style={{
+                                                            background: item.stock_qty <= 0 ? '#ccc' : 'var(--primary-color)',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            padding: '0.4rem 1rem',
+                                                            borderRadius: '6px',
+                                                            cursor: item.stock_qty > 0 ? 'pointer' : 'not-allowed',
+                                                            fontSize: '0.9rem',
+                                                            boxShadow: item.stock_qty > 0 ? '0 2px 4px rgba(0,0,0,0.1)' : 'none'
+                                                        }}
+                                                    >
+                                                        + Add
+                                                    </button>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 )
@@ -300,6 +298,25 @@ const SellingPage = () => {
 
                 {/* Bill Content */}
                 <div style={cardStyle}>
+
+                    {/* Explicit Error Banner for Form-Level Errors (Like Backend Add Failures) */}
+                    {errors.form && (
+                        <div style={{
+                            backgroundColor: '#FDE8E8',
+                            color: '#C81E1E',
+                            padding: '0.75rem',
+                            borderRadius: '6px',
+                            marginBottom: '1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            fontSize: '0.9rem',
+                            border: '1px solid #F8B4B4'
+                        }}>
+                            <span>⚠️</span>
+                            <span style={{ fontWeight: '500' }}>{errors.form}</span>
+                        </div>
+                    )}
 
                     {/* Cart Table Header */}
                     <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 30px', gap: '0.5rem', paddingBottom: '0.5rem', borderBottom: '2px solid #eee', fontWeight: 'bold', color: '#666', fontSize: '0.9rem' }}>
@@ -352,26 +369,22 @@ const SellingPage = () => {
                     </div>
 
                     {/* Total Section */}
-                    <div
-                        className="bg-gradient-to-br from-red-50 to-white border border-red-100 p-5 rounded-xl shadow-sm"
-                        style={{ marginBottom: '2.5rem' }}
-                    >
-                        <div className="flex flex-wrap justify-between items-center gap-4">
-                            <div className="flex flex-col">
-                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Total Payable</span>
-                                {/* <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full w-fit font-medium">Tax Included</span> */}
-                            </div>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-lg font-bold text-gray-400">IQD</span>
-                                <span className="text-4xl font-black text-gray-800 tracking-tight">
-                                    {calculateTotal().toLocaleString()}
-                                </span>
-                            </div>
+                    <div style={{
+                        marginTop: 'auto',
+                        borderTop: '2px solid #eee',
+                        paddingTop: '1rem',
+                        marginBottom: '1rem'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '1.2rem', fontWeight: 'bold' }}>
+                            <span>Total Payable</span>
+                            <span style={{ color: '#000' }}>
+                                IQD {calculateTotal().toLocaleString()}
+                            </span>
                         </div>
                     </div>
 
                     {/* Form Inputs */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div>
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Pay Total</label>
                             <input
@@ -384,7 +397,7 @@ const SellingPage = () => {
                                 value={payTotal}
                                 onChange={(e) => setPayTotal(e.target.value)}
                             />
-                            {/* Future: If we mapped payment errors specifically to this field */}
+                            {errors.payTotal && <div style={{ color: '#d32f2f', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors.payTotal}</div>}
                         </div>
                         <div>
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '0.25rem', color: '#555' }}>Customer Name</label>
@@ -415,7 +428,8 @@ const SellingPage = () => {
                             <button
                                 onClick={handleComplete}
                                 disabled={loading || cart.length === 0}
-                                className="btn btn-success w-full  bg-green-800 hover:bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer display-flex items-center justify-center gap-2 box-shadow-md hover:box-shadow-lg active:scale-95 transition-all duration-200"
+                                className="btn btn-success"
+                                style={{ width: '100%', justifyContent: 'center' }}
                             >
                                 Complete Sale
                             </button>

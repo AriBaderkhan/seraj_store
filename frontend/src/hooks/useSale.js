@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import * as saleService from '../services/saleService';
 import * as cartService from '../services/cartService';
 import { toast } from 'react-hot-toast';
@@ -8,6 +8,8 @@ const useSale = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const [pendingAdds, setPendingAdds] = useState(new Set());
 
     // --- SEARCH EFFECT ---
     useEffect(() => {
@@ -73,10 +75,10 @@ const useSale = () => {
             const data = await saleService.findItem(searchQuery);
             setSearchResults(data);
         } catch (error) {
-            console.error("Search error:", error);
-            // Propagate if needed, or just silence it as it's a search box
-            // For now, let's throw so UI can decide to show red box or not
-            throw error;
+            const msg = error.response?.data?.message || error.message || "Phone Already in the cart";
+            const code = error.response?.data?.support_code || error.response?.data?.code;
+            const finalMsg = code ? `${msg} (Support Code: ${code})` : msg;
+            throw new Error(finalMsg);
         } finally {
             setLoading(false);
         }
@@ -84,26 +86,14 @@ const useSale = () => {
 
     // --- CART ACTIONS ---
     const addToCart = async (item, qtyToAdd = 1) => {
-        // Validation Logic (Mirroring backend constraints or UX rules)
+        // Validation Logic
+        // Relaxed checks to rely on backend validation
         if (item.item_type === 'phone') {
-            // Unique IMEI check in current cart
-            const exists = cart.find(c => c.imei1 === item.imei1 && c.imei1);
-            if (exists) {
-                throw new Error("Device already in cart!");
-            }
-            qtyToAdd = 1; // Phones are always 1
-        } else {
-            // Stock Check
-            const existingItem = cart.find(c => c.id === item.id && !c.imei1);
-            const currentQty = existingItem ? existingItem.qty : 0;
-            if (currentQty + qtyToAdd > item.stock_qty) {
-                throw new Error(`Stock limit reached! (${item.stock_qty})`);
-            }
+            qtyToAdd = 1;
         }
 
         try {
             // Add to Backend
-            // Schema: item_id, item_name, imei, qty, selling_price
             await cartService.createCart({
                 item_id: item.id,
                 item_name: item.name,
@@ -117,7 +107,10 @@ const useSale = () => {
 
         } catch (error) {
             console.error("Add to cart error:", error);
-            throw error;
+            const msg = error.response?.data?.message || error.message || "Failed to add to cart";
+            const code = error.response?.data?.support_code || error.response?.data?.code;
+            const finalMsg = code ? `${msg} (Support Code: ${code})` : msg;
+            throw new Error(finalMsg);
         }
     };
 
@@ -140,10 +133,10 @@ const useSale = () => {
         }
     };
 
-    const calculateTotal = () => {
+    const calculateTotal = useCallback(() => {
         // Backend returns mapped 'total_amount' which is SUM(row_total) or SUM(selling_price * qty)
         return cart.reduce((total, item) => total + Number(item.total_amount), 0);
-    };
+    }, [cart]);
 
     const completeSale = async (paymentDetails) => {
         if (cart.length === 0) {

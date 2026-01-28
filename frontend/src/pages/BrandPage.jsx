@@ -37,7 +37,7 @@ const BrandPage = () => {
 
         const submissionData = {
             name: formData.name,
-            description: formData.description,
+            description: formData.description || '',
             category_ids: Array.isArray(formData.category_ids) ? formData.category_ids : []
         };
 
