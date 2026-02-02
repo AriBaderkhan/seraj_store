@@ -35,8 +35,7 @@ RETURNING *;`
 }
 async function deleteCategoryById(category_id) {
     const query = `DELETE FROM categories WHERE id=$1 RETURNING *`;
-    const values = [category_id];
-    const result = await pool.query(query, values);
+    const result = await pool.query(query, [category_id]);
     return result.rows[0]
 }
 

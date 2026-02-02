@@ -69,7 +69,7 @@ async function updateBrand(brand_id, { name, description, updated_by }) {
 
 async function deleteBrandById(brand_id) {
     const query = `DELETE FROM brands WHERE id=$1 RETURNING *`;
-    const result = await pool.query(query, values);
+    const result = await pool.query(query, [brand_id]);
     return result.rows[0]
 }
 
@@ -80,8 +80,7 @@ async function findBrandsByCategoryId(category_id) {
     JOIN category_brands cb ON b.id = cb.brand_id
     WHERE cb.category_id = $1
     `;
-    const values = [category_id];
-    const result = await pool.query(query, values);
+    const result = await pool.query(query, [category_id]);
     return result.rows;
 }
 

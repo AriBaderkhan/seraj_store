@@ -26,7 +26,7 @@ function App() {
   return (
     <>
       <OfflineNotice />
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       <Routes>
         <Route path="/login" element={<Login />} />
 
